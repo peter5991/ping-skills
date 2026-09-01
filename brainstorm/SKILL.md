@@ -109,6 +109,9 @@ description: 结构化头脑风暴。当用户需要头脑风暴、讨论方案�
 │   ├── rules.md
 │   ├── decisions.md
 │   └── context.json
+├── logs/                   # 操作与修改记录
+│   ├── operations.log      # 操作流水：谁在何时做了什么操作
+│   └── changes.md          # 修改记录：文件/功能的变更历史与原因
 └── output/                 # 输出目录（不入库）
     ├── reports/
     ├── charts/
@@ -125,7 +128,8 @@ description: 结构化头脑风暴。当用户需要头脑风暴、讨论方案�
 6. **生成命令模板**：`commands/` 下三个 `.md`，含 frontmatter（description）与参数/步骤/示例。
 7. **生成技能与智能体**：`skills/*/SKILL.md` 与 `agents/*.md` 骨架文件。
 8. **生成记忆文件**：`memory/rules.md`（项目规则）、`memory/decisions.md`（决策记录）、`memory/context.json`（上下文）。
-9. **初始化 .gitignore**：忽略 `node_modules/`、`.env`、`output/` 产物。
+9. **生成日志文件**：`logs/operations.log`（操作流水，格式：`[时间] [操作者] 操作内容`）、`logs/changes.md`（修改记录，格式：`## 日期` + 变更文件 + 变更原因）。
+10. **初始化 .gitignore**：忽略 `node_modules/`、`.env`、`output/` 产物（`logs/` 默认入库，便于追溯）。
 
 ### 设计原则
 
@@ -133,6 +137,7 @@ description: 结构化头脑风暴。当用户需要头脑风暴、讨论方案�
 - **可扩展性**：skills 与 agents 采用「子目录 + 定义文件」模式，便于新增能力。
 - **上下文持久化**：规则与决策写入 `memory/`，跨会话保持一致。
 - **声明式配置**：命令与技能用 Markdown 定义，降低使用门槛。
+- **可追溯性**：Agent 每次对项目的操作与修改都应追加到 `logs/`（操作流水进 `operations.log`，变更说明进 `changes.md`），保证历史可审计。
 
 ### 可选变体
 
