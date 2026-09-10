@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<!--
+⚠️ 警告：本页面仅为 33 项 Web 动画效果的【可运行参考】，禁止直接作为交付模板。
+  1. 所有库通过 CDN 加载，断网无法运行 —— 正式交付必须本地化（见 ../references/libs.md 与 ../scripts/fetch-libs.mjs）。
+  2. 本页同时加载 GSAP/Anime.js/AOS/ScrollReveal/Lenis 等多套职责重叠的库，仅用于横向对比；正式页面遵守「一个动画职责一个主控方案」。
+  3. 部分示例动画 filter/clip-path/left/top 等高开销属性，正式产物以 transform 与 opacity 为准。
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web 动画技术 · 超全效果展示</title>
+
+<!-- ===== 外部库 CDN ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://unpkg.com/scrollreveal"></script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vivus/0.4.6/vivus.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popmotion@11.0.5/dist/popmotion.global.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+
+<style>
+:root { --bg:#0a0e14; --card:#11161d; --line:#1f2937; --green:#00e5a0; --blue:#58a6ff; --purple:#bc8cff; --orange:#ffa657; --red:#ff7b72; --cyan:#39d0d8; --text:#e6edf3; --dim:#8b949e; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; line-height:1.7; overflow-x:hidden; }
+.wrap { max-width:960px; margin:0 auto; padding:60px 20px 120px; }
+.hero { text-align:center; margin-bottom:80px; }
+.hero h1 { font-size:2.4rem; background:linear-gradient(90deg,var(--green),var(--blue),var(--purple),var(--orange)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:var(--dim); margin-top:12px; font-size:1.05rem; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:32px; margin-bottom:40px; position:relative; overflow:hidden; }
+.card h2 { font-size:1.25rem; margin-bottom:6px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.num { display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--green),#00b8d4); color:#04121a; font-weight:700; font-size:.9rem; }
+.tag { font-size:.7rem; color:var(--dim); border:1px solid var(--line); border-radius:20px; padding:2px 10px; white-space:nowrap; }
+.desc { color:var(--dim); font-size:.92rem; margin-bottom:20px; }
+.desc b { color:var(--text); }
+.demo { background:#0b0f14; border:1px dashed var(--line); border-radius:12px; padding:28px; min-height:140px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px; position:relative; overflow:hidden; }
+.hint { font-size:.72rem; color:var(--dim); text-align:center; }
+
+/* ===== 01 reveal.js ===== */
+.reveal-holder { width:100%; height:340px; }
+.reveal { font-size:20px; border-radius:10px; overflow:hidden; }
+
+/* ===== 02 CSS keyframes ===== */
+.ball { width:44px; height:44px; border-radius:50%; background:radial-gradient(circle at 30% 30%, var(--green), #007a52); animation:bounce .8s cubic-bezier(.5,0,1,1) infinite alternate; }
+@keyframes bounce { from { transform:translateY(-70px); } to { transform:translateY(20px); } }
+.shine { font-size:1.5rem; font-weight:700; background:linear-gradient(90deg,var(--green),var(--blue),var(--purple),var(--green)); background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:shine 4s linear infinite; }
+@keyframes shine { to { background-position:300% 0; } }
+.pulse-dot { width:18px; height:18px; border-radius:50%; background:var(--orange); animation:pulse 1.4s ease-out infinite; }
+@keyframes pulse { 0%{ box-shadow:0 0 0 0 rgba(255,166,87,.6);} 100%{ box-shadow:0 0 0 22px rgba(255,166,87,0);} }
+
+/* ===== 03 CSS transition ===== */
+.hover-btn { padding:12px 34px; border-radius:10px; font-size:1rem; font-weight:600; color:var(--text); background:#21262d; border:1px solid var(--line); cursor:pointer; transition:all .35s cubic-bezier(.34,1.56,.64,1); }
+.hover-btn:hover { background:var(--green); color:#04121a; transform:translateY(-4px) rotate(-2deg); box-shadow:0 12px 30px rgba(0,229,160,.25); }
+.lift-card { width:200px; padding:20px; border-radius:12px; background:#21262d; border:1px solid var(--line); transition:transform .3s ease, box-shadow .3s ease; }
+.lift-card:hover { transform:translateY(-8px); box-shadow:0 16px 40px rgba(0,0,0,.5); }
+
+/* ===== 04 GSAP ===== */
+#gsapSection { min-height:180vh; position:relative; }
+#gsapPin { position:sticky; top:80px; }
+#progressBarWrap { width:100%; height:12px; background:#21262d; border-radius:8px; overflow:hidden; }
+#progressBar { width:0%; height:100%; background:linear-gradient(90deg,var(--green),var(--blue)); border-radius:8px; }
+#rocket { font-size:2.4rem; will-change:transform; }
+
+/* ===== 05 anime.js ===== */
+#dotGrid { display:grid; grid-template-columns:repeat(8,34px); gap:10px; }
+#dotGrid div { width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,var(--purple),var(--blue)); }
+.btn { background:linear-gradient(135deg,var(--green),#00b8d4); color:#04121a; border:none; padding:10px 26px; border-radius:8px; font-size:.95rem; font-weight:600; cursor:pointer; transition:transform .15s ease; }
+.btn:hover { transform:translateY(-2px) scale(1.03); }
+.btn:active { transform:scale(.97); }
+
+/* ===== 06 Lottie ===== */
+
+/* ===== 07 Three.js ===== */
+
+/* ===== 08 View Transitions ===== */
+.vt-area { display:flex; align-items:center; gap:24px; flex-wrap:wrap; justify-content:center; }
+.vt-box { width:220px; height:120px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+#vtA { background:linear-gradient(135deg,#1f6feb,#58a6ff); }
+#vtB { background:linear-gradient(135deg,#9e6a03,#ffa657); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration:.5s; }
+
+/* ===== 09 Lenis ===== */
+
+/* ===== 10 AOS ===== */
+.aos-box { width:120px; height:120px; border-radius:14px; background:linear-gradient(135deg,var(--green),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:2rem; color:#04121a; font-weight:700; }
+
+/* ===== 11 ScrollReveal ===== */
+.sr-box { width:160px; height:80px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--blue)); display:flex; align-items:center; justify-content:center; font-weight:600; color:#fff; }
+
+/* ===== 12 tsParticles ===== */
+#tsparticles { width:100%; height:220px; border-radius:10px; background:#0b0f14; }
+
+/* ===== 13 Vivus ===== */
+#vivus-svg { width:200px; height:200px; }
+#vivus-svg path { fill:none; stroke:var(--green); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* ===== 14 Typed.js ===== */
+.typed-wrap { font-size:1.3rem; font-family:monospace; color:var(--green); min-height:40px; }
+.typed-cursor { color:var(--green); }
+
+/* ===== 15 Swiper ===== */
+.swiper { width:100%; max-width:500px; height:180px; border-radius:12px; }
+.swiper-slide { display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; color:#fff; border-radius:12px; }
+.s1 { background:linear-gradient(135deg,var(--green),var(--cyan)); color:#04121a; }
+.s2 { background:linear-gradient(135deg,var(--blue),var(--purple)); }
+.s3 { background:linear-gradient(135deg,var(--orange),var(--red)); }
+
+/* ===== 16 p5.js ===== */
+#p5-container canvas { border-radius:10px; }
+
+/* ===== 17 Popmotion ===== */
+#popBox { width:80px; height:80px; border-radius:16px; background:linear-gradient(135deg,var(--orange),var(--red)); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.6rem; will-change:transform; }
+
+/* ===== 18 PixiJS ===== */
+#pixiCanvas { border-radius:10px; }
+
+/* ===== 19 CSS 3D transforms ===== */
+.cube-scene { perspective:600px; width:100px; height:100px; }
+.cube { width:100px; height:100px; position:relative; transform-style:preserve-3d; animation:spinCube 6s linear infinite; }
+.cube-face { position:absolute; width:100px; height:100px; border:1px solid var(--green); background:rgba(0,229,160,.15); display:flex; align-items:center; justify-content:center; font-size:.8rem; color:var(--green); font-weight:600; }
+.cf1 { transform:rotateY(0deg) translateZ(50px); }
+.cf2 { transform:rotateY(90deg) translateZ(50px); }
+.cf3 { transform:rotateY(180deg) translateZ(50px); }
+.cf4 { transform:rotateY(-90deg) translateZ(50px); }
+.cf5 { transform:rotateX(90deg) translateZ(50px); }
+.cf6 { transform:rotateX(-90deg) translateZ(50px); }
+@keyframes spinCube { from { transform:rotateX(-15deg) rotateY(0deg); } to { transform:rotateX(-15deg) rotateY(360deg); } }
+
+/* ===== 20 CSS scroll-timeline ===== */
+@supports (animation-timeline:scroll()) {
+  .scroll-timeline-demo { animation:growUp linear; animation-timeline:view(); animation-range:entry 0% cover 50%; }
+}
+@supports not (animation-timeline:scroll()) {
+  .scroll-timeline-demo { opacity:1; transform:scale(1); }
+}
+.scroll-timeline-demo { width:100%; height:100px; border-radius:12px; background:linear-gradient(90deg,var(--green),var(--blue)); display:flex; align-items:center; justify-content:center; font-weight:700; color:#04121a; font-size:1.1rem; }
+@keyframes growUp { from { opacity:0; transform:scaleX(0.3); } to { opacity:1; transform:scaleX(1); } }
+
+/* ===== 21 Canvas 2D 手写粒子 ===== */
+#handCanvas { width:100%; height:200px; border-radius:10px; background:#0b0f14; }
+
+/* ===== 22 CSS clip-path ===== */
+.clip-shape { width:200px; height:200px; background:linear-gradient(135deg,var(--purple),var(--blue)); animation:morph 4s ease-in-out infinite; }
+@keyframes morph {
+  0%,100% { clip-path:circle(40% at 50% 50%); }
+  25% { clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+  50% { clip-path:polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
+  75% { clip-path:ellipse(40% 50% at 50% 50%); }
+}
+
+/* ===== 23 CSS filter 动画 ===== */
+.filter-img { width:180px; height:120px; border-radius:10px; background:linear-gradient(135deg,var(--green),var(--blue)); display:flex; align-items:center; justify-content:center; font-weight:700; color:#04121a; animation:filterAnim 3s ease-in-out infinite; }
+@keyframes filterAnim {
+  0%,100% { filter:brightness(1) blur(0px) hue-rotate(0deg); }
+  33% { filter:brightness(1.3) blur(2px) hue-rotate(30deg); }
+  66% { filter:brightness(0.7) blur(1px) hue-rotate(-20deg); }
+}
+
+/* ===== 24 Intersection Observer + CSS ===== */
+.io-box { width:140px; height:140px; border-radius:14px; background:linear-gradient(135deg,var(--orange),var(--red)); opacity:0; transform:translateY(40px) scale(0.8); transition:all .8s cubic-bezier(.34,1.56,.64,1); display:flex; align-items:center; justify-content:center; font-weight:700; }
+.io-box.visible { opacity:1; transform:translateY(0) scale(1); }
+
+/* ===== 25 视差滚动 ===== */
+.parallax-wrap { width:100%; height:200px; border-radius:12px; overflow:hidden; position:relative; background:#0b0f14; }
+.parallax-layer { position:absolute; width:120%; height:120%; left:-10%; top:-10%; background:radial-gradient(circle at 30% 30%, var(--green) 0%, transparent 50%), radial-gradient(circle at 70% 70%, var(--blue) 0%, transparent 50%); will-change:transform; }
+.parallax-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.4rem; font-weight:700; color:var(--text); z-index:2; }
+
+/* ===== 26 CSS scroll-snap ===== */
+.snap-container { width:100%; max-width:400px; height:160px; overflow-x:auto; display:flex; scroll-snap-type:x mandatory; gap:12px; padding:8px; border-radius:12px; background:#0b0f14; }
+.snap-item { flex:0 0 140px; height:100%; border-radius:10px; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.2rem; color:#fff; }
+
+/* ===== 27 鼠标跟随 ===== */
+#mouseFollowArea { width:100%; height:180px; border-radius:12px; background:#0b0f14; position:relative; overflow:hidden; cursor:crosshair; }
+#follower { position:absolute; width:40px; height:40px; border-radius:50%; background:radial-gradient(circle, var(--green), transparent 70%); pointer-events:none; transition:transform .1s ease-out; filter:blur(4px); }
+
+/* ===== 28 文字乱码效果 ===== */
+.scramble-text { font-size:1.3rem; font-family:monospace; color:var(--green); cursor:pointer; user-select:none; }
+
+/* ===== 29 CSS Grid 动画 ===== */
+.grid-anim { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; width:100%; max-width:320px; }
+.grid-anim div { height:50px; border-radius:8px; background:linear-gradient(135deg,var(--green),var(--cyan)); opacity:0; transform:scale(0.5); }
+
+/* ===== 30 SVG 路径动画 ===== */
+#svgPathAnim path { fill:none; stroke:var(--blue); stroke-width:3; stroke-dasharray:1000; stroke-dashoffset:1000; animation:drawPath 3s ease-in-out infinite alternate; }
+@keyframes drawPath { to { stroke-dashoffset:0; } }
+
+/* ===== 31 Web Animations API ===== */
+#waapiBox { width:80px; height:80px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--red)); cursor:pointer; }
+
+/* ===== 32 CSS 变量动画 ===== */
+.css-var-demo { --size:60px; --color:var(--green); width:var(--size); height:var(--size); border-radius:50%; background:var(--color); animation:varPulse 2s ease-in-out infinite; }
+@keyframes varPulse { 0%,100% { --size:60px; --color:var(--green); } 50% { --size:100px; --color:var(--blue); } }
+@supports not (animation:varPulse) { .css-var-demo { animation:none; width:80px; height:80px; background:var(--green); } }
+
+/* ===== 33 弹簧物理效果 (手写) ===== */
+.spring-box { width:60px; height:60px; border-radius:12px; background:linear-gradient(135deg,var(--orange),var(--red)); cursor:pointer; }
+
+.footer { color:var(--dim); font-size:.85rem; border-top:1px solid var(--line); padding-top:28px; margin-top:20px; }
+.footer b { color:var(--green); }
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#7a2e0e;color:#ffe1c2;padding:10px 16px;font-size:14px;text-align:center;">⚠️ 本页依赖 CDN 且多动画库并存，仅作效果参考，<b>禁止直接作为交付模板</b>。交付规范见同目录 SKILL.md。</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Web 动画技术 · 超全效果展示</h1>
+    <p>33 项技术，从上到下依次浏览，每个区块都有可实际运行的效果</p>
+  </div>
+
+  <!-- ===== 01 reveal.js ===== -->
+  <div class="card">
+    <h2><span class="num">01</span> reveal.js <span class="tag">HTML 演示框架</span></h2>
+    <p class="desc"><b>功能：</b>把网页变成 PPT——分页翻片、键盘/触屏控制、逐条出现（Fragment）、片间过渡。点击后按方向键翻页。</p>
+    <div class="demo reveal-holder">
+      <div class="reveal">
+        <div class="slides">
+          <section><h3>第 1 页</h3><p>reveal.js 负责翻片逻辑</p></section>
+          <section><h3>Fragment 逐条出现</h3><p class="fragment">第一条 🍎</p><p class="fragment">第二条 🍌</p><p class="fragment">第三条 🍊</p></section>
+          <section><h3>完</h3><p>就这么简单</p></section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 02 CSS @keyframes ===== -->
+  <div class="card">
+    <h2><span class="num">02</span> CSS @keyframes <span class="tag">零依赖 · 原生 CSS</span></h2>
+    <p class="desc"><b>功能：</b>最简单的循环/入场动画，不占 JS 主线程，性能最好。适合做弹跳球、流光文字、呼吸圆点等<b>循环型</b>效果。</p>
+    <div class="demo">
+      <div style="height:140px; display:flex; align-items:flex-end;"><div class="ball"></div></div>
+      <div class="shine">流光渐变文字</div>
+      <div class="pulse-dot"></div>
+      <p class="hint">全部纯 CSS，约 10 行代码</p>
+    </div>
+  </div>
+
+  <!-- ===== 03 CSS transition ===== -->
+  <div class="card">
+    <h2><span class="num">03</span> CSS transition <span class="tag">零依赖 · 原生 CSS</span></h2>
+    <p class="desc"><b>功能：</b>元素状态变化时（hover、class 切换）的<b>平滑过渡</b>，交互反馈的标准做法。</p>
+    <div class="demo">
+      <button class="hover-btn">悬停我试试</button>
+      <div class="lift-card">🖱️ 悬停卡片：上浮 + 阴影</div>
+    </div>
+  </div>
+
+  <!-- ===== 04 GSAP + ScrollTrigger ===== -->
+  <div class="card" id="gsapSection">
+    <div id="gsapPin">
+      <h2><span class="num">04</span> GSAP + ScrollTrigger <span class="tag">专业动画引擎</span></h2>
+      <p class="desc"><b>功能：</b>时间轴编排 + <b>滚动驱动</b>动画。下面进度条和火箭的进度完全由你的滚动位置控制。</p>
+      <div class="demo" style="min-height:260px;">
+        <div id="progressBarWrap"><div id="progressBar"></div></div>
+        <div id="rocket">🚀</div>
+        <p class="hint">↓ 继续往下滚动，观察进度条和火箭</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 05 Anime.js ===== -->
+  <div class="card">
+    <h2><span class="num">05</span> Anime.js <span class="tag">轻量动画引擎</span></h2>
+    <p class="desc"><b>功能：</b>stagger 交错序列——一组元素按顺序依次动画，网格波浪效果一行代码搞定。</p>
+    <div class="demo">
+      <div id="dotGrid"></div>
+      <button class="btn" id="playAnime">▶ 重新播放 stagger</button>
+    </div>
+  </div>
+
+  <!-- ===== 06 Lottie ===== -->
+  <div class="card">
+    <h2><span class="num">06</span> Lottie <span class="tag">AE 动画 → JSON</span></h2>
+    <p class="desc"><b>功能：</b>设计师在 After Effects 里做好动画导出 JSON，前端一行代码播放。<b>网页端不用写动画代码</b>。</p>
+    <div class="demo">
+      <lottie-player id="lottieDemo" autoplay loop style="width:240px; height:240px;"></lottie-player>
+      <p class="hint">内嵌 JSON 演示；真实项目中设计师给的 JSON 会复杂得多</p>
+    </div>
+  </div>
+
+  <!-- ===== 07 Three.js ===== -->
+  <div class="card">
+    <h2><span class="num">07</span> Three.js <span class="tag">WebGL 3D</span></h2>
+    <p class="desc"><b>功能：</b>在网页里渲染 3D 场景——产品模型展示、粒子特效、自定义 shader、相机环绕展示。</p>
+    <div class="demo">
+      <canvas id="threeCanvas" width="300" height="240"></canvas>
+      <p class="hint">真实项目可换成产品模型、做相机环绕、鼠标交互旋转</p>
+    </div>
+  </div>
+
+  <!-- ===== 08 View Transitions API ===== -->
+  <div class="card">
+    <h2><span class="num">08</span> View Transitions API <span class="tag">浏览器原生 · Chrome 111+</span></h2>
+    <p class="desc"><b>功能：</b>浏览器原生支持的"状态间过渡"，一个 JS 调用 + 几行 CSS，实现类似 PPT 的<b>平滑切换</b>。</p>
+    <div class="demo">
+      <div class="vt-area">
+        <div class="vt-box" id="vtA">状态 A</div>
+        <button class="btn" id="vtBtn">⇄ 切换状态</button>
+      </div>
+      <div class="vt-box" id="vtB" style="display:none;">状态 B</div>
+      <p class="hint">旧浏览器会退化为直接切换（无动画但不报错）</p>
+    </div>
+  </div>
+
+  <!-- ===== 09 Lenis ===== -->
+  <div class="card">
+    <h2><span class="num">09</span> Lenis <span class="tag">平滑滚动</span></h2>
+    <p class="desc"><b>功能：</b>让页面滚动如丝般顺滑（类似 iOS 的惯性手感）。<b>这个页面本身已经启用了 Lenis</b>——用滚轮慢慢滚动，对比普通网页的"一顿一顿"。</p>
+    <div class="demo"><p style="font-size:1.4rem;">📜 你正在体验它</p></div>
+  </div>
+
+  <!-- ===== 10 AOS ===== -->
+  <div class="card">
+    <h2><span class="num">10</span> AOS (Animate On Scroll) <span class="tag">滚动触发 · 极简</span></h2>
+    <p class="desc"><b>功能：</b>元素进入视口时自动触发动画，一行 HTML 属性搞定，无需写 JS。往下滚动看这些方块依次出现。</p>
+    <div class="demo" style="flex-direction:row; flex-wrap:wrap; gap:20px;">
+      <div class="aos-box" data-aos="fade-up">fade-up</div>
+      <div class="aos-box" data-aos="fade-left" data-aos-delay="100">fade-left</div>
+      <div class="aos-box" data-aos="zoom-in" data-aos-delay="200">zoom-in</div>
+      <div class="aos-box" data-aos="flip-left" data-aos-delay="300">flip-left</div>
+      <div class="aos-box" data-aos="fade-down" data-aos-delay="400">fade-down</div>
+    </div>
+  </div>
+
+  <!-- ===== 11 ScrollReveal ===== -->
+  <div class="card">
+    <h2><span class="num">11</span> ScrollReveal <span class="tag">滚动触发 · 灵活</span></h2>
+    <p class="desc"><b>功能：</b>比 AOS 更灵活的滚动触发动画库，支持自定义距离、方向、持续时间、延迟、缩放等。往下滚动触发。</p>
+    <div class="demo" style="flex-direction:row; flex-wrap:wrap; gap:16px;">
+      <div class="sr-box sr1">从左侧滑入</div>
+      <div class="sr-box sr2">从右侧滑入</div>
+      <div class="sr-box sr3">从底部升起</div>
+      <div class="sr-box sr4">旋转进入</div>
+    </div>
+  </div>
+
+  <!-- ===== 12 tsParticles ===== -->
+  <div class="card">
+    <h2><span class="num">12</span> tsParticles <span class="tag">粒子系统</span></h2>
+    <p class="desc"><b>功能：</b>轻量级粒子动画库，可创建雪花、星空、烟花、气泡等粒子效果，支持鼠标交互（悬停/点击）。</p>
+    <div class="demo" style="padding:0; overflow:hidden;">
+      <div id="tsparticles"></div>
+      <p class="hint" style="position:absolute; bottom:8px; left:0; right:0;">移动鼠标与粒子互动，点击产生爆发</p>
+    </div>
+  </div>
+
+  <!-- ===== 13 Vivus ===== -->
+  <div class="card">
+    <h2><span class="num">13</span> Vivus <span class="tag">SVG 描边动画</span></h2>
+    <p class="desc"><b>功能：</b>让 SVG 路径像被"画"出来一样逐笔显示，适合 logo 展示、图标绘制、签名效果。</p>
+    <div class="demo">
+      <svg id="vivus-svg" viewBox="0 0 200 200">
+        <path d="M100 20 L180 180 L20 180 Z" />
+        <path d="M100 20 L100 180" />
+        <path d="M20 180 L180 180" />
+        <circle cx="100" cy="100" r="60" />
+      </svg>
+      <button class="btn" id="replayVivus">↻ 重播描边</button>
+    </div>
+  </div>
+
+  <!-- ===== 14 Typed.js ===== -->
+  <div class="card">
+    <h2><span class="num">14</span> Typed.js <span class="tag">打字机效果</span></h2>
+    <p class="desc"><b>功能：</b>模拟打字机逐字输入效果，支持退格、多行切换、自定义速度，常用于首页标语、代码展示。</p>
+    <div class="demo">
+      <div class="typed-wrap"><span id="typed"></span></div>
+      <button class="btn" id="replayTyped">↻ 重新打字</button>
+    </div>
+  </div>
+
+  <!-- ===== 15 Swiper ===== -->
+  <div class="card">
+    <h2><span class="num">15</span> Swiper <span class="tag">轮播/滑动</span></h2>
+    <p class="desc"><b>功能：</b>现代触摸滑动轮播库，支持 3D 切换、视差、无限循环、自动播放、缩略图联动，移动端体验极佳。</p>
+    <div class="demo">
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide s1">Slide 1</div>
+          <div class="swiper-slide s2">Slide 2</div>
+          <div class="swiper-slide s3">Slide 3</div>
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+      <p class="hint">支持触摸滑动、键盘方向键、鼠标滚轮</p>
+    </div>
+  </div>
+
+  <!-- ===== 16 p5.js ===== -->
+  <div class="card">
+    <h2><span class="num">16</span> p5.js <span class="tag">创意编程</span></h2>
+    <p class="desc"><b>功能：</b>Processing 的 JavaScript 版本，面向艺术家和设计师，用代码生成交互式视觉艺术、生成式设计、数据可视化。</p>
+    <div class="demo" id="p5-container"></div>
+  </div>
+
+  <!-- ===== 17 Popmotion ===== -->
+  <div class="card">
+    <h2><span class="num">17</span> Popmotion <span class="tag">物理动画 · 函数式</span></h2>
+    <p class="desc"><b>功能：</b>基于真实物理模型（弹簧、惯性、衰减）的动画库，函数式 API，可精确控制每一帧。点击方块体验弹簧回弹。</p>
+    <div class="demo">
+      <div id="popBox">🎯</div>
+      <p class="hint">点击方块，观察弹簧物理回弹效果</p>
+    </div>
+  </div>
+
+  <!-- ===== 18 PixiJS ===== -->
+  <div class="card">
+    <h2><span class="num">18</span> PixiJS <span class="tag">2D 图形引擎 · WebGL</span></h2>
+    <p class="desc"><b>功能：</b>高性能 2D 渲染引擎，使用 WebGL GPU 加速，适合游戏、数据可视化、大量图形对象同时动画。</p>
+    <div class="demo">
+      <canvas id="pixiCanvas" width="500" height="180"></canvas>
+      <p class="hint">200 个精灵同时旋转 + 颜色变化，60fps 不掉帧</p>
+    </div>
+  </div>
+
+  <!-- ===== 19 CSS 3D transforms ===== -->
+  <div class="card">
+    <h2><span class="num">19</span> CSS 3D Transforms <span class="tag">零依赖 · 原生 CSS</span></h2>
+    <p class="desc"><b>功能：</b>纯 CSS 实现 3D 旋转立方体、卡片翻转、景深透视效果，无需任何 JS 库。</p>
+    <div class="demo">
+      <div class="cube-scene">
+        <div class="cube">
+          <div class="cube-face cf1">前</div>
+          <div class="cube-face cf2">右</div>
+          <div class="cube-face cf3">后</div>
+          <div class="cube-face cf4">左</div>
+          <div class="cube-face cf5">上</div>
+          <div class="cube-face cf6">下</div>
+        </div>
+      </div>
+      <p class="hint">只用 CSS transform-style: preserve-3d + @keyframes</p>
+    </div>
+  </div>
+
+  <!-- ===== 20 CSS Scroll-Driven Animations ===== -->
+  <div class="card">
+    <h2><span class="num">20</span> CSS Scroll-Driven Animations <span class="tag">浏览器原生 · Chrome 115+</span></h2>
+    <p class="desc"><b>功能：</b>纯 CSS 实现滚动驱动动画，无需 GSAP 或 JS。元素进入视口时自动播放，用 <code>animation-timeline: view()</code> 控制。</p>
+    <div class="demo">
+      <div class="scroll-timeline-demo">滚动驱动：进入视口时从窄变宽</div>
+      <p class="hint">Chrome 115+ 支持；旧浏览器直接显示最终状态</p>
+    </div>
+  </div>
+
+  <!-- ===== 21 Canvas 2D 手写粒子 ===== -->
+  <div class="card">
+    <h2><span class="num">21</span> Canvas 2D 手写粒子 <span class="tag">原生 API · 零依赖</span></h2>
+    <p class="desc"><b>功能：</b>直接用 Canvas 2D API 手写粒子系统，完全可控，无库依赖。适合定制化需求，如星空、烟花、流体模拟。</p>
+    <div class="demo" style="padding:0;">
+      <canvas id="handCanvas" width="600" height="200"></canvas>
+      <p class="hint" style="position:absolute; bottom:8px; left:0; right:0;">鼠标移动产生粒子轨迹，点击产生爆炸</p>
+    </div>
+  </div>
+
+  <!-- ===== 22 CSS clip-path ===== -->
+  <div class="card">
+    <h2><span class="num">22</span> CSS clip-path <span class="tag">零依赖 · 原生 CSS</span></h2>
+    <p class="desc"><b>功能：</b>通过裁剪路径实现形状变形动画——圆形变菱形变梯形变椭圆，常用于图片揭示、转场效果。</p>
+    <div class="demo">
+      <div class="clip-shape"></div>
+      <p class="hint">4 种形状无限循环变形</p>
+    </div>
+  </div>
+
+  <!-- ===== 23 CSS filter 动画 ===== -->
+  <div class="card">
+    <h2><span class="num">23</span> CSS filter 动画 <span class="tag">零依赖 · 原生 CSS</span></h2>
+    <p class="desc"><b>功能：</b>对元素应用 blur（模糊）、brightness（亮度）、hue-rotate（色相旋转）、contrast（对比度）等滤镜并做动画。</p>
+    <div class="demo">
+      <div class="filter-img">滤镜动画</div>
+      <p class="hint">brightness + blur + hue-rotate 组合变化</p>
+    </div>
+  </div>
+
+  <!-- ===== 24 Intersection Observer + CSS ===== -->
+  <div class="card">
+    <h2><span class="num">24</span> Intersection Observer + CSS <span class="tag">原生 API · 零依赖</span></h2>
+    <p class="desc"><b>功能：</b>浏览器原生 API 检测元素是否进入视口，配合 CSS transition 实现滚动触发动画。<b>不依赖任何库</b>，性能最佳。</p>
+    <div class="demo" style="flex-direction:row; flex-wrap:wrap; gap:16px;">
+      <div class="io-box" data-io>IO 1</div>
+      <div class="io-box" data-io>IO 2</div>
+      <div class="io-box" data-io>IO 3</div>
+      <div class="io-box" data-io>IO 4</div>
+    </div>
+  </div>
+
+  <!-- ===== 25 视差滚动 ===== -->
+  <div class="card">
+    <h2><span class="num">25</span> 视差滚动 (Parallax) <span class="tag">原生 JS · 零依赖</span></h2>
+    <p class="desc"><b>功能：</b>多层背景以不同速度滚动，产生深度感。常用于落地页、故事叙事。下面背景层随滚动偏移，文字层固定。</p>
+    <div class="demo" style="padding:0;">
+      <div class="parallax-wrap" id="parallaxWrap">
+        <div class="parallax-layer" id="parallaxLayer"></div>
+        <div class="parallax-text">视差效果</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 26 CSS scroll-snap ===== -->
+  <div class="card">
+    <h2><span class="num">26</span> CSS scroll-snap <span class="tag">浏览器原生 · 零依赖</span></h2>
+    <p class="desc"><b>功能：</b>让滚动容器中的子元素"吸附"到固定位置，像轮播一样逐张切换。纯 CSS，无需 JS。</p>
+    <div class="demo">
+      <div class="snap-container">
+        <div class="snap-item" style="background:linear-gradient(135deg,var(--green),var(--cyan)); color:#04121a;">1</div>
+        <div class="snap-item" style="background:linear-gradient(135deg,var(--blue),var(--purple));">2</div>
+        <div class="snap-item" style="background:linear-gradient(135deg,var(--orange),var(--red));">3</div>
+        <div class="snap-item" style="background:linear-gradient(135deg,var(--purple),var(--green));">4</div>
+        <div class="snap-item" style="background:linear-gradient(135deg,var(--cyan),var(--blue));">5</div>
+      </div>
+      <p class="hint">左右拖动，卡片会吸附到中心位置</p>
+    </div>
+  </div>
+
+  <!-- ===== 27 鼠标跟随 ===== -->
+  <div class="card">
+    <h2><span class="num">27</span> 鼠标跟随效果 <span class="tag">原生 JS · 零依赖</span></h2>
+    <p class="desc"><b>功能：</b>元素跟随鼠标移动，可配合模糊、发光、延迟拖尾做出炫酷的光标效果。常用于科技风落地页。</p>
+    <div class="demo" style="padding:0;">
+      <div id="mouseFollowArea">
+        <div id="follower"></div>
+        <p style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--dim); pointer-events:none;">在此区域移动鼠标</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 28 文字乱码效果 ===== -->
+  <div class="card">
+    <h2><span class="num">28</span> 文字乱码/解码效果 <span class="tag">手写 JS · 零依赖</span></h2>
+    <p class="desc"><b>功能：</b>文字从随机字符逐渐"解码"为正确内容，常见于黑客/科技风格网站。纯手写，无需库。</p>
+    <div class="demo">
+      <div class="scramble-text" id="scrambleText" data-final="HELLO WORLD">HELLO WORLD</div>
+      <button class="btn" id="replayScramble">↻ 重新解码</button>
+    </div>
+  </div>
+
+  <!-- ===== 29 CSS Grid 动画 ===== -->
+  <div class="card">
+    <h2><span class="num">29</span> CSS Grid + Intersection Observer <span class="tag">原生技术</span></h2>
+    <p class="desc"><b>功能：</b>Grid 布局配合滚动触发的 stagger 入场动画。元素按网格顺序依次淡入，常用于功能列表、作品集展示。</p>
+    <div class="demo">
+      <div class="grid-anim" id="gridAnim">
+        <div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <p class="hint">往下滚动，网格元素会依次 stagger 入场</p>
+    </div>
+  </div>
+
+  <!-- ===== 30 SVG 路径动画 ===== -->
+  <div class="card">
+    <h2><span class="num">30</span> SVG 路径动画 (stroke-dasharray) <span class="tag">零依赖 · 原生 CSS</span></h2>
+    <p class="desc"><b>功能：</b>利用 SVG 的 stroke-dasharray 和 stroke-dashoffset 属性，让路径像被画出来一样，比 Vivus 更轻量。</p>
+    <div class="demo">
+      <svg id="svgPathAnim" width="300" height="120" viewBox="0 0 300 120">
+        <path d="M10 60 Q 80 10, 150 60 T 290 60" />
+        <path d="M10 60 L 290 60" />
+      </svg>
+      <p class="hint">纯 CSS 实现，无需任何 JS 库</p>
+    </div>
+  </div>
+
+  <!-- ===== 31 Web Animations API ===== -->
+  <div class="card">
+    <h2><span class="num">31</span> Web Animations API (WAAPI) <span class="tag">浏览器原生</span></h2>
+    <p class="desc"><b>功能：</b>JS 直接控制浏览器原生动画引擎，与 CSS 动画互操作，支持播放/暂停/倒放/速率控制，无依赖。</p>
+    <div class="demo">
+      <div id="waapiBox"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" id="waapiPlay">▶ 播放</button>
+        <button class="btn" id="waapiPause">⏸ 暂停</button>
+        <button class="btn" id="waapiReverse">⏪ 倒放</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 32 CSS 变量动画 ===== -->
+  <div class="card">
+    <h2><span class="num">32</span> CSS 自定义属性动画 <span class="tag">原生 CSS · 较新</span></h2>
+    <p class="desc"><b>功能：</b>在 @keyframes 中直接动画 CSS 自定义属性（变量），实现大小、颜色等属性的程序化变化。Chrome 131+ 支持。</p>
+    <div class="demo">
+      <div class="css-var-demo"></div>
+      <p class="hint">@property 注册后可在 keyframes 中动画化变量</p>
+    </div>
+  </div>
+
+  <!-- ===== 33 弹簧物理效果 ===== -->
+  <div class="card">
+    <h2><span class="num">33</span> 手写弹簧物理效果 <span class="tag">原生 JS · 零依赖</span></h2>
+    <p class="desc"><b>功能：</b>用 requestAnimationFrame 手写弹簧物理模型（胡克定律），点击后元素像弹簧一样弹跳到位。</p>
+    <div class="demo">
+      <div class="spring-box" id="springBox"></div>
+      <p class="hint">点击方块，观察手写弹簧物理的弹跳效果</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>💡 <b>性能铁律：</b>无论用哪个库，只动画 <b>transform</b> 和 <b>opacity</b>（GPU 加速），避免动画 width / height / top / left。</p>
+    <p>本页面所有外部库均通过 CDN 加载，需要联网打开。</p>
+  </div>
+</div>
+
+<script>
+/* ========== 01 reveal.js ========== */
+try {
+  Reveal.initialize({ embedded:true, hash:false, controls:true, progress:true, margin:0.03, width:"100%", height:"100%", minScale:0.2, maxScale:1.5 });
+} catch(e) {}
+
+/* ========== 04 GSAP ========== */
+if (window.gsap && window.ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.to("#progressBar", { width:"100%", ease:"none", scrollTrigger:{ trigger:"#gsapSection", start:"top 60%", end:"bottom 80%", scrub:0.5 } });
+  gsap.fromTo("#rocket", { x:-160, rotate:-10 }, { x:160, rotate:10, ease:"none", scrollTrigger:{ trigger:"#gsapSection", start:"top 60%", end:"bottom 80%", scrub:0.5 } });
+}
+
+/* ========== 05 Anime.js ========== */
+var grid = document.getElementById('dotGrid');
+for (var i=0;i<48;i++){ var d=document.createElement('div'); grid.appendChild(d); }
+function playStagger(){
+  if (!window.anime) return;
+  anime({ targets:'#dotGrid div', scale:[{value:.1,easing:'easeOutSine',duration:500},{value:1,easing:'easeInOutQuad',duration:1200}], delay:anime.stagger(60,{grid:[8,6],from:'center'}), loop:false });
+}
+document.getElementById('playAnime').addEventListener('click', playStagger);
+
+/* ========== 06 Lottie ========== */
+var lottieJson = {"v":"5.7.4","fr":30,"ip":0,"op":120,"w":220,"h":220,"nm":"demo","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":1,"nm":"block","sr":1,"ks":{"o":{"a":0,"k":100},"r":{"a":1,"k":[{"i":{"x":[0.3],"y":[1]},"o":{"x":[0.7],"y":[0]},"t":0,"s":[0]},{"i":{"x":[0.3],"y":[1]},"o":{"x":[0.7],"y":[0]},"t":60,"s":[180]},{"t":120,"s":[360]}]},"p":{"a":1,"k":[{"i":{"x":0.3,"y":1},"o":{"x":0.7,"y":0},"t":0,"s":[40,110,0]},{"i":{"x":0.3,"y":1},"o":{"x":0.7,"y":0},"t":60,"s":[180,110,0]},{"t":120,"s":[40,110,0]}]},"a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},"ao":0,"sw":42,"sh":42,"sc":"#00e5a0","ip":0,"op":120,"st":0}]};
+try { var lp=document.getElementById('lottieDemo'); if(lp&&lp.load) lp.load(lottieJson); } catch(e){}
+
+/* ========== 07 Three.js ========== */
+try {
+  var canvas = document.getElementById('threeCanvas');
+  var renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true });
+  renderer.setSize(300,240,false);
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b0f14);
+  var camera = new THREE.PerspectiveCamera(60, 300/240, 0.1, 100); camera.position.z = 3.2;
+  var geo = new THREE.BoxGeometry(1.4,1.4,1.4);
+  var mat = new THREE.MeshBasicMaterial({ color:0x00e5a0, wireframe:true });
+  var cube = new THREE.Mesh(geo, mat); scene.add(cube);
+  (function animate(){ requestAnimationFrame(animate); cube.rotation.x += 0.012; cube.rotation.y += 0.02; renderer.render(scene, camera); })();
+} catch(e){}
+
+/* ========== 08 View Transitions ========== */
+var vtA = document.getElementById('vtA'), vtB = document.getElementById('vtB');
+document.getElementById('vtBtn').addEventListener('click', function(){
+  var swap = function(){ var aOn = vtA.style.display !== 'none'; vtA.style.display = aOn ? 'none' : 'flex'; vtB.style.display = aOn ? 'flex' : 'none'; };
+  if (document.startViewTransition) { document.startViewTransition(swap); } else { swap(); }
+});
+
+/* ========== 09 Lenis ========== */
+try { if(window.Lenis){ var lenis = new Lenis({ lerp:0.08, smoothWheel:true }); function raf(t){ lenis.raf(t); requestAnimationFrame(raf); } requestAnimationFrame(raf); } } catch(e){}
+
+/* ========== 10 AOS ========== */
+try { AOS.init({ duration:800, once:true, offset:60 }); } catch(e){}
+
+/* ========== 11 ScrollReveal ========== */
+try {
+  var sr = ScrollReveal({ duration:900, distance:'60px', easing:'cubic-bezier(0.5, 0, 0, 1)', reset:true });
+  sr.reveal('.sr1', { origin:'left', delay:0 });
+  sr.reveal('.sr2', { origin:'right', delay:150 });
+  sr.reveal('.sr3', { origin:'bottom', delay:300, scale:0.8 });
+  sr.reveal('.sr4', { origin:'top', delay:450, rotate:{ x:0, y:0, z:45 } });
+} catch(e){}
+
+/* ========== 12 tsParticles ========== */
+try {
+  tsParticles.load("tsparticles", {
+    fullScreen:{ enable:false },
+    particles:{
+      number:{ value:60 }, color:{ value:["#00e5a0","#58a6ff","#bc8cff","#ffa657"] },
+      shape:{ type:"circle" }, opacity:{ value:0.6 }, size:{ value:{ min:2, max:6 } },
+      move:{ enable:true, speed:1.5, direction:"none", outModes:"bounce" },
+      links:{ enable:true, distance:100, color:"#1f2937", opacity:0.4, width:1 }
+    },
+    interactivity:{
+      events:{ onHover:{ enable:true, mode:"repulse" }, onClick:{ enable:true, mode:"push" } },
+      modes:{ repulse:{ distance:80 }, push:{ quantity:4 } }
+    }
+  });
+} catch(e){}
+
+/* ========== 13 Vivus ========== */
+var vivusInstance;
+function initVivus(){
+  try { if(vivusInstance) vivusInstance.destroy(); vivusInstance = new Vivus('vivus-svg', { type:'oneByOne', duration:120, animTimingFunction:Vivus.EASE }); } catch(e){}
+}
+initVivus();
+document.getElementById('replayVivus').addEventListener('click', function(){ try{ vivusInstance.reset().play(); }catch(e){ initVivus(); } });
+
+/* ========== 14 Typed.js ========== */
+var typedInstance;
+function initTyped(){
+  try { if(typedInstance) typedInstance.destroy(); typedInstance = new Typed('#typed', { strings:["Hello, World!","Web 动画技术展示","33 种效果等你体验"], typeSpeed:60, backSpeed:30, backDelay:1500, loop:true, showCursor:true, cursorChar:"|" }); } catch(e){}
+}
+initTyped();
+document.getElementById('replayTyped').addEventListener('click', function(){ initTyped(); });
+
+/* ========== 15 Swiper ========== */
+try {
+  new Swiper(".mySwiper", { pagination:{ el:".swiper-pagination", clickable:true }, loop:true, autoplay:{ delay:2500, disableOnInteraction:false }, keyboard:{ enabled:true } });
+} catch(e){}
+
+/* ========== 16 p5.js ========== */
+try {
+  new p5(function(p){
+    var t=0;
+    p.setup = function(){ var c = p.createCanvas(500,180); c.parent('p5-container'); p.noFill(); };
+    p.draw = function(){ p.background(11,15,20); p.stroke(0,229,160); p.strokeWeight(2); p.beginShape(); for(var x=0; x<p.width; x+=5){ p.vertex(x, p.height/2 + p.sin(x*0.02 + t)*40 + p.sin(x*0.05 + t*1.5)*20); } p.endShape(); t += 0.03; };
+  });
+} catch(e){}
+
+/* ========== 17 Popmotion ========== */
+try {
+  var popBox = document.getElementById('popBox');
+  var popSpring = popmotion.spring({ stiffness:300, damping:15, mass:1, to:0, from:0 });
+  popBox.addEventListener('click', function(){
+    popmotion.animate({ from:0, to:1, type:"spring", stiffness:400, damping:10, onUpdate:function(v){ popBox.style.transform = 'scale(' + (1 + v*0.5) + ') rotate(' + (v*20) + 'deg)'; } });
+  });
+} catch(e){}
+
+/* ========== 18 PixiJS ========== */
+try {
+  var app = new PIXI.Application({ view:document.getElementById('pixiCanvas'), width:500, height:180, backgroundColor:0x0b0f14, antialias:true });
+  var sprites = [];
+  for(var i=0; i<200; i++){
+    var g = new PIXI.Graphics(); g.beginFill([0x00e5a0,0x58a6ff,0xbc8cff,0xffa657][i%4]); g.drawCircle(0,0,3+Math.random()*3); g.endFill();
+    var s = new PIXI.Sprite(app.renderer.generateTexture(g)); s.x=Math.random()*500; s.y=Math.random()*180; s.anchor.set(0.5); s.vx=(Math.random()-0.5)*2; s.vy=(Math.random()-0.5)*2; app.stage.addChild(s); sprites.push(s);
+  }
+  app.ticker.add(function(){
+    for(var i=0; i<sprites.length; i++){
+      var s=sprites[i]; s.x+=s.vx; s.y+=s.vy; s.rotation+=0.02;
+      if(s.x<0||s.x>500) s.vx*=-1; if(s.y<0||s.y>180) s.vy*=-1;
+    }
+  });
+} catch(e){}
+
+/* ========== 21 Canvas 2D 手写粒子 ========== */
+(function(){
+  var cvs = document.getElementById('handCanvas');
+  var ctx = cvs.getContext('2d');
+  var W = cvs.width = cvs.offsetWidth;
+  var H = cvs.height = cvs.offsetHeight;
+  var particles = [];
+  function Particle(x,y,vx,vy,color,life){ this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.color=color; this.life=life; this.maxLife=life; this.size=Math.random()*4+2; }
+  Particle.prototype.update = function(){ this.x+=this.vx; this.y+=this.vy; this.vy+=0.1; this.life--; this.size*=0.97; };
+  Particle.prototype.draw = function(){ ctx.globalAlpha = this.life/this.maxLife; ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); };
+  function spawn(x,y,count,explode){
+    for(var i=0;i<count;i++){
+      var angle = Math.random()*Math.PI*2;
+      var speed = explode ? Math.random()*6+2 : Math.random()*2;
+      particles.push(new Particle(x,y, Math.cos(angle)*speed, Math.sin(angle)*speed, ['#00e5a0','#58a6ff','#bc8cff','#ffa657'][Math.floor(Math.random()*4)], 60+Math.random()*40));
+    }
+  }
+  cvs.addEventListener('mousemove', function(e){ var rect=cvs.getBoundingClientRect(); spawn(e.clientX-rect.left, e.clientY-rect.top, 2, false); });
+  cvs.addEventListener('click', function(e){ var rect=cvs.getBoundingClientRect(); spawn(e.clientX-rect.left, e.clientY-rect.top, 30, true); });
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=particles.length-1;i>=0;i--){ particles[i].update(); particles[i].draw(); if(particles[i].life<=0) particles.splice(i,1); }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ========== 24 Intersection Observer ========== */
+(function(){
+  var ioBoxes = document.querySelectorAll('[data-io]');
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){ if(entry.isIntersecting) entry.target.classList.add('visible'); });
+  }, { threshold:0.2 });
+  ioBoxes.forEach(function(box){ observer.observe(box); });
+})();
+
+/* ========== 25 视差滚动 ========== */
+(function(){
+  var layer = document.getElementById('parallaxLayer');
+  if(layer){
+    window.addEventListener('scroll', function(){
+      var rect = document.getElementById('parallaxWrap').getBoundingClientRect();
+      var progress = 1 - (rect.top + rect.height) / (window.innerHeight + rect.height);
+      layer.style.transform = 'translateY(' + (progress * 40 - 20) + 'px)';
+    });
+  }
+})();
+
+/* ========== 27 鼠标跟随 ========== */
+(function(){
+  var area = document.getElementById('mouseFollowArea');
+  var follower = document.getElementById('follower');
+  if(!area || !follower) return;
+  var mx=area.offsetWidth/2, my=area.offsetHeight/2, fx=mx, fy=my;
+  area.addEventListener('mousemove', function(e){ var rect=area.getBoundingClientRect(); mx=e.clientX-rect.left; my=e.clientY-rect.top; });
+  function followLoop(){ fx += (mx-fx)*0.15; fy += (my-fy)*0.15; follower.style.left = (fx-20) + 'px'; follower.style.top = (fy-20) + 'px'; requestAnimationFrame(followLoop); }
+  followLoop();
+})();
+
+/* ========== 28 文字乱码效果 ========== */
+(function(){
+  var el = document.getElementById('scrambleText');
+  var finalText = el.getAttribute('data-final');
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  var isRunning = false;
+  function scramble(){
+    if(isRunning) return; isRunning = true;
+    var iterations = 0;
+    var interval = setInterval(function(){
+      el.innerText = finalText.split('').map(function(letter, index){
+        if(index < iterations) return finalText[index];
+        return chars[Math.floor(Math.random()*chars.length)];
+      }).join('');
+      if(iterations >= finalText.length){ clearInterval(interval); isRunning = false; }
+      iterations += 1/3;
+    }, 30);
+  }
+  el.addEventListener('click', scramble);
+  scramble();
+  document.getElementById('replayScramble').addEventListener('click', scramble);
+})();
+
+/* ========== 29 CSS Grid 动画 ========== */
+(function(){
+  var gridItems = document.querySelectorAll('#gridAnim div');
+  var gridObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        gridItems.forEach(function(item, i){
+          setTimeout(function(){ item.style.transition='all .6s cubic-bezier(.34,1.56,.64,1)'; item.style.opacity='1'; item.style.transform='scale(1)'; }, i*80);
+        });
+      }
+    });
+  }, { threshold:0.3 });
+  gridObserver.observe(document.getElementById('gridAnim'));
+})();
+
+/* ========== 31 Web Animations API ========== */
+(function(){
+  var box = document.getElementById('waapiBox');
+  var anim;
+  function createAnim(){ anim = box.animate([{ transform:'rotate(0deg) scale(1)', borderRadius:'12px', background:'linear-gradient(135deg,#bc8cff,#ff7b72)' }, { transform:'rotate(360deg) scale(1.3)', borderRadius:'50%', background:'linear-gradient(135deg,#00e5a0,#58a6ff)' }, { transform:'rotate(720deg) scale(1)', borderRadius:'12px', background:'linear-gradient(135deg,#bc8cff,#ff7b72)' }], { duration:2000, iterations:Infinity, easing:'ease-in-out' }); }
+  createAnim();
+  document.getElementById('waapiPlay').addEventListener('click', function(){ if(anim) anim.play(); });
+  document.getElementById('waapiPause').addEventListener('click', function(){ if(anim) anim.pause(); });
+  document.getElementById('waapiReverse').addEventListener('click', function(){ if(anim){ anim.reverse(); anim.play(); } });
+})();
+
+/* ========== 33 手写弹簧物理 ========== */
+(function(){
+  var box = document.getElementById('springBox');
+  var targetX = 0, currentX = 0, velocity = 0;
+  var k = 0.08, damping = 0.85;
+  function springLoop(){
+    var force = (targetX - currentX) * k;
+    velocity += force;
+    velocity *= damping;
+    currentX += velocity;
+    box.style.transform = 'translateX(' + currentX + 'px)';
+    requestAnimationFrame(springLoop);
+  }
+  springLoop();
+  box.addEventListener('click', function(){ targetX = targetX === 0 ? 200 : 0; });
+})();
+</script>
+</body>
+</html>
