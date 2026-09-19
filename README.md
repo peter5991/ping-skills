@@ -10,6 +10,10 @@
 | [ppt-pyramid-planner](ppt-pyramid-planner/) | 三层金字塔模型规划 PPT 内容结构：一句话核心主张 → MECE 支撑论点 → 逐页大字文案 | 做 PPT、路演稿、答辩稿、工作汇报、列大纲 |
 | [html-motion-craft](html-motion-craft/) | HTML 演示页动效选型与执行规范：性能红线、单一主控库、本地化离线交付，内置 33 项效果索引 | 网页动画、滚动叙事长页、分页式网页 PPT |
 | [bp-roadshow-guide](bp-roadshow-guide/) | 创业/双创比赛商业计划书(BP)撰写与路演设计指导：评审逻辑、BP 17 模块、路演全流程、PPT 与网页双载体规范，附自检清单 | 商业计划书、网评材料、参赛 PPT、路演设计、路演网页 |
+| [competition-deck](competition-deck/) | 16:9 翻页式「类 PPT」网页制作：10 种比赛页型目录、浅色竞赛母版 token、Codex CLI 配图管线，比赛/通用双模式 | 比赛 PPT 网页、路演网页、参赛演示页、PPT 式 HTML、幻灯片网页 |
+| [lesson-prep](lesson-prep/) | 备课预制课件页工作流：滚动叙事解禁、GSAP/Lenis 本地库、七配方武器库、探针验收、课程登记 | 备课、照教案做网页、预制课件页 |
+
+> 注:competition-deck 与 lesson-prep 源自私有项目(课堂 AI 助教),文中部分路径(如 `assets/lesson/libs/`、`electron/agent/pagegen-prompt.ts`)相对该项目仓库,移植使用时需按自身环境调整。
 
 ## 安装
 
