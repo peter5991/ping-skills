@@ -8,7 +8,7 @@
 |---|---|---|
 | [brainstorm](brainstorm/) | 结构化头脑风暴：强制先澄清意图，再以正向/中立/反向三视角逐轮碰撞，收敛为综合建议 | 讨论方案、发散思考、分析决策、评估想法 |
 | [ppt-pyramid-planner](ppt-pyramid-planner/) | 三层金字塔模型规划 PPT 内容结构：一句话核心主张 → MECE 支撑论点 → 逐页大字文案 | 做 PPT、路演稿、答辩稿、工作汇报、列大纲 |
-| [html-motion-craft](html-motion-craft/) | HTML 演示页动效选型与执行规范：性能红线、单一主控库、本地化离线交付，内置 33 项效果索引 | 网页动画、滚动叙事长页、分页式网页 PPT |
+| [frontend-craft](frontend-craft/) | 全栈前端设计规范：布局/排版/配色/动效选型与执行标准,T0/T1/T2 手法分级库、手感参数表、Three.js 通用规范与 3D 案例库（取代 html-motion-craft) | 制作网页/落地页/作品集/展示页/路演页，讨论某个效果或动效怎么实现 |
 | [bp-roadshow-guide](bp-roadshow-guide/) | 创业/双创比赛商业计划书(BP)撰写与路演设计指导：评审逻辑、BP 17 模块、路演全流程、PPT 与网页双载体规范，附自检清单 | 商业计划书、网评材料、参赛 PPT、路演设计、路演网页 |
 | [competition-deck](competition-deck/) | 16:9 翻页式「类 PPT」网页制作：10 种比赛页型目录、浅色竞赛母版 token、Codex CLI 配图管线，比赛/通用双模式 | 比赛 PPT 网页、路演网页、参赛演示页、PPT 式 HTML、幻灯片网页 |
 | [lesson-prep](lesson-prep/) | 备课预制课件页工作流：滚动叙事解禁、GSAP/Lenis 本地库、七配方武器库、探针验收、课程登记 | 备课、照教案做网页、预制课件页 |

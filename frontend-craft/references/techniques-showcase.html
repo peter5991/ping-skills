@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontend Craft — T0 手法展示页</title>
+<style>
+/* ============ tokens ============ */
+:root{
+  --bg:#0d1411;            /* 深色底,向主色微偏 */
+  --surface:#16201a;       /* 表面色,明度阶梯 */
+  --surface-2:#1d2a22;
+  --line:rgba(233,242,236,.09);
+  --text:#e9f2ec;
+  --muted:rgba(233,242,236,.55);
+  --accent:#7ce8b5;        /* 单主色:薄荷绿 */
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+  line-height:1.6;overflow-x:hidden;
+}
+::selection{background:var(--accent);color:#0d1411}
+.num{font-variant-numeric:tabular-nums}
+
+/* ============ T0-8 预加载器 ============ */
+#preloader{
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:6vh 6vw;transition:transform .8s var(--ease-out);
+}
+#preloader.done{transform:translateY(-100%)}
+#preloader .pl-label{font-size:14px;color:var(--muted);letter-spacing:.2em}
+#preloader .pl-num{
+  font-size:clamp(80px,14vw,200px);font-weight:700;line-height:1;
+  color:var(--accent);overflow:hidden;height:1em;
+}
+#preloader .pl-num span{display:inline-block;animation:plRise .3s var(--ease-out)}
+@keyframes plRise{from{transform:translate3d(0,100%,0)}to{transform:translate3d(0,0,0)}}
+
+/* ============ T0-7 自定义光标(增强,不替代原生) ============ */
+#cursor{
+  position:fixed;top:0;left:0;z-index:190;pointer-events:none;
+  width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;
+  border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;
+  transition:width .3s var(--ease-out),height .3s var(--ease-out),
+             margin .3s var(--ease-out),background-color .3s var(--ease-out);
+  font-size:12px;color:#0d1411;font-weight:700;
+}
+#cursor.on{width:72px;height:72px;margin:-36px 0 0 -36px;background:var(--accent)}
+#cursor .cl{opacity:0;transition:opacity .2s}
+#cursor.on .cl{opacity:1}
+@media (hover:none){#cursor{display:none}}
+
+/* ============ T0-4 mix-blend 固定导航 ============ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px 6vw;mix-blend-mode:difference;color:#fff;
+}
+nav .logo{font-weight:700;font-size:15px;letter-spacing:.12em}
+nav ul{display:flex;gap:34px;list-style:none}
+nav a{color:#fff;text-decoration:none;font-size:14px}
+
+/* ============ T0-3 roll-over 文字 hover ============ */
+.roll{display:inline-block;overflow:hidden;height:1.5em;vertical-align:bottom}
+.roll .roll-box{display:block;transition:transform .35s var(--ease-out)}
+.roll .roll-box span{display:block;height:1.5em}
+.roll:hover .roll-box{transform:translateY(-1.5em)}
+.roll .roll-box span:last-child{color:var(--accent)}
+nav .roll .roll-box span:last-child{color:#fff;text-decoration:underline}
+
+/* ============ 通用布局 ============ */
+section{padding:14vh 6vw;border-top:1px solid var(--line);position:relative}
+.sec-head{display:grid;grid-template-columns:180px 1fr;gap:24px;margin-bottom:8vh}
+.sec-idx{font-size:13px;color:var(--accent);letter-spacing:.15em;font-weight:700}
+.sec-title{font-size:clamp(28px,3.4vw,44px);font-weight:700;line-height:1.2}
+.sec-note{color:var(--muted);font-size:15px;max-width:560px;margin-top:10px}
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:48px;position:relative;overflow:hidden}
+.replay{
+  position:absolute;top:16px;right:16px;background:none;border:1px solid var(--line);
+  color:var(--muted);font-size:12px;padding:6px 14px;border-radius:99px;cursor:pointer;
+  font-family:inherit;transition:color .25s,border-color .25s;
+}
+.replay:hover{color:var(--accent);border-color:var(--accent)}
+h2.hero-title{
+  font-size:clamp(48px,9vw,132px);font-weight:700;line-height:1.05;
+  letter-spacing:-.02em;margin:4vh 0 3vh;
+}
+h2.hero-title .accent{color:var(--accent)}
+.hero-sub{font-size:clamp(16px,1.6vw,22px);color:var(--muted);max-width:640px}
+
+/* ============ T0-1 遮罩逐行入场 ============ */
+.line{display:block;overflow:hidden}
+.line .inner{display:inline-block;transform:translateY(105%)}
+.line.play .inner{animation:lineRise .6s var(--ease-out) forwards}
+.line.play:nth-child(2) .inner{animation-delay:.12s}
+.line.play:nth-child(3) .inner{animation-delay:.24s}
+@keyframes lineRise{to{transform:translateY(0)}}
+
+/* ============ T0-2 scramble ============ */
+.scramble-target{font-size:clamp(28px,4vw,56px);font-weight:700;min-height:1.3em}
+
+/* ============ T0-11 spring hover ============ */
+.tags{display:flex;gap:16px;flex-wrap:wrap}
+.tag{
+  padding:14px 26px;border:1px solid var(--line);border-radius:99px;
+  font-size:15px;cursor:pointer;user-select:none;background:var(--surface-2);
+  transition:transform .5s var(--spring),border-color .3s,color .3s;
+}
+.tag:hover{transform:scale(1.12) rotate(-2deg);border-color:var(--accent);color:var(--accent)}
+
+/* ============ T0-9 跟随图片预览 ============ */
+.works{list-style:none}
+.works li{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:26px 8px;border-top:1px solid var(--line);cursor:pointer;
+  transition:opacity .3s;
+}
+.works li:last-child{border-bottom:1px solid var(--line)}
+.works:hover li{opacity:.45}
+.works:hover li:hover{opacity:1}
+.works .w-title{font-size:clamp(20px,2.4vw,32px);font-weight:700}
+.works .w-meta{color:var(--muted);font-size:13px;letter-spacing:.1em}
+#preview{
+  position:fixed;top:0;left:0;z-index:90;pointer-events:none;
+  width:240px;height:160px;border-radius:6px;opacity:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:56px;font-weight:700;color:#0d1411;
+  transition:opacity .3s var(--ease-out);
+}
+#preview.show{opacity:1}
+
+/* ============ T0-5 SVG 描边 ============ */
+#drawSvg{width:100%;height:auto;display:block}
+#drawSvg path,#drawSvg circle{fill:none;stroke:var(--accent);stroke-width:2}
+#drawSvg .axis{stroke:var(--muted);stroke-width:1}
+#drawSvg .drawn{stroke-dasharray:1;stroke-dashoffset:1}
+#drawSvg.play .d1{animation:draw 1s var(--ease-out) forwards}
+#drawSvg.play .d2{animation:draw 1s var(--ease-out) .5s forwards}
+#drawSvg.play .d3{animation:draw 1.4s var(--ease-out) 1.1s forwards}
+#drawSvg.play .d4{animation:draw .5s var(--ease-out) 2.3s forwards}
+#drawSvg.play .d5{animation:draw .8s var(--ease-out) 2.7s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* ============ T0-6 lerp 实验室 ============ */
+#lerpLab{height:320px;cursor:crosshair}
+#ball{
+  position:absolute;width:44px;height:44px;border-radius:50%;
+  background:var(--accent);top:0;left:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#0d1411;
+}
+.lerp-ctl{display:flex;align-items:center;gap:18px;margin-top:24px}
+.lerp-ctl input[type=range]{flex:1;accent-color:var(--accent);height:32px}
+.lerp-ctl .readout{font-size:28px;font-weight:700;color:var(--accent);min-width:90px;text-align:right}
+
+/* ============ T0-10 视差 ============ */
+.parallax-zone{height:70vh;display:flex;align-items:center;justify-content:center;gap:6vw}
+.px-block{
+  width:22vw;max-width:260px;aspect-ratio:3/4;border-radius:8px;
+  display:flex;align-items:flex-end;padding:20px;font-weight:700;
+  will-change:transform;
+}
+.px-1{background:var(--surface-2)}
+.px-2{background:var(--accent);color:#0d1411}
+.px-3{background:var(--surface);border:1px solid var(--line)}
+
+/* ============ T0-12 声明式 reveal ============ */
+[data-reveal]{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
+[data-reveal].in{opacity:1;transform:translateY(0)}
+pre{
+  background:#0a0f0c;border:1px solid var(--line);border-radius:6px;
+  padding:24px;overflow-x:auto;font-size:13px;line-height:1.7;
+  color:var(--muted);font-family:Consolas,Menlo,monospace;
+}
+pre b{color:var(--accent);font-weight:400}
+
+/* ============ 页脚 ============ */
+footer{padding:10vh 6vw 12vh;border-top:1px solid var(--line)}
+footer h3{font-size:clamp(24px,3vw,40px);margin-bottom:24px}
+footer p{color:var(--muted);max-width:640px;font-size:15px}
+footer .ban{margin-top:32px;font-size:13px;color:var(--muted);line-height:2}
+footer .ban em{color:var(--accent);font-style:normal}
+
+@media (max-width:760px){
+  .sec-head{grid-template-columns:1fr}
+  nav ul{gap:18px}
+  .demo{padding:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- T0-8 预加载器 -->
+<div id="preloader">
+  <div class="pl-label">FRONTEND CRAFT<br>TECHNIQUES</div>
+  <div class="pl-num"><span class="num" id="plNum">0</span></div>
+</div>
+
+<!-- T0-7 自定义光标 -->
+<div id="cursor"><span class="cl" id="cursorLabel"></span></div>
+
+<!-- T0-4 blend 导航 + T0-3 roll-over + T0-2 scramble hover -->
+<nav>
+  <div class="logo">FRONTEND—CRAFT</div>
+  <ul>
+    <li><a href="#sec-reveal" data-scramble>入场</a></li>
+    <li><a href="#sec-hover" data-scramble>悬停</a></li>
+    <li><a href="#sec-motion" data-scramble>手感</a></li>
+    <li><a href="#sec-decl" data-scramble>声明式</a></li>
+  </ul>
+</nav>
+
+<!-- HERO:T0-1 遮罩逐行 + T0-2 scramble -->
+<section style="border-top:none;min-height:92vh;display:flex;flex-direction:column;justify-content:center">
+  <div class="sec-idx" style="margin-bottom:2vh">TECHNIQUES SHOWCASE — T0 / VANILLA</div>
+  <h2 class="hero-title">
+    <span class="line"><span class="inner">高级感不来自</span></span>
+    <span class="line"><span class="inner"><span class="accent" id="heroWord">WebGL</span></span></span>
+    <span class="line"><span class="inner">来自阻尼与克制</span></span>
+  </h2>
+  <p class="hero-sub line"><span class="inner">本页离线单文件、零依赖,演示 frontend-craft 手法库全部 T0 手法。每个 demo 即 techniques.md 对应条目的活标本。</span></p>
+</section>
+
+<!-- T0-1 遮罩逐行入场 -->
+<section id="sec-reveal">
+  <div class="sec-head">
+    <div class="sec-idx">T0-01 / MASK REVEAL</div>
+    <div>
+      <div class="sec-title">遮罩逐行入场</div>
+      <p class="sec-note">九站共通的第一入场手法:overflow:hidden 容器 + translateY(105%)→0,逐行 delay .12s。零依赖,永远优先于任何库。</p>
+    </div>
+  </div>
+  <div class="demo" id="revealDemo">
+    <button class="replay" data-replay="reveal">重播</button>
+    <div style="font-size:clamp(24px,3.4vw,48px);font-weight:700;line-height:1.4">
+      <span class="line"><span class="inner">文字装进遮罩容器,</span></span>
+      <span class="line"><span class="inner">从 <span style="color:var(--accent)">105%</span> 处升起,</span></span>
+      <span class="line"><span class="inner">一行接一行。</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- T0-2 scramble -->
+<section>
+  <div class="sec-head">
+    <div class="sec-idx">T0-02 / SCRAMBLE</div>
+    <div>
+      <div class="sec-title">文字扰动归位</div>
+      <p class="sec-note">~30 行 vanilla:字母随机洗牌、逐位归位。load 版给主标题,hover 版给导航(把鼠标移到顶部导航试试)。一页一处,正文不用。</p>
+    </div>
+  </div>
+  <div class="demo">
+    <button class="replay" data-replay="scramble">重播</button>
+    <div class="scramble-target" id="scrambleTarget">DAMPING IS LUXURY</div>
+  </div>
+</section>
+
+<!-- T0-3 + T0-11 hover 编排 -->
+<section id="sec-hover">
+  <div class="sec-head">
+    <div class="sec-idx">T0-03 · T0-11 / HOVER</div>
+    <div>
+      <div class="sec-title">hover 反馈编排:roll-over 与弹簧</div>
+      <p class="sec-note">每个可交互元素都有反馈设计,是"被设计过"和"默认样式"的分水岭。spring 缓动只给小件微交互,入场编排保持 ease-out。</p>
+    </div>
+  </div>
+  <div class="demo">
+    <div style="font-size:clamp(20px,2.6vw,34px);font-weight:700;line-height:2.2">
+      <a class="roll" href="#sec-hover" style="color:var(--text);text-decoration:none"><span class="roll-box"><span>关于手法库</span><span>关于手法库</span></span></a><br>
+      <a class="roll" href="#sec-hover" style="color:var(--text);text-decoration:none"><span class="roll-box"><span>查看参数表</span><span>查看参数表</span></span></a><br>
+      <a class="roll" href="#sec-hover" style="color:var(--text);text-decoration:none"><span class="roll-box"><span>阅读验收清单</span><span>阅读验收清单</span></span></a>
+    </div>
+    <div class="tags" style="margin-top:40px">
+      <span class="tag">spring</span><span class="tag">cubic-bezier(.34,1.56,.64,1)</span><span class="tag">scale 1.12</span><span class="tag">rotate −2°</span>
+    </div>
+  </div>
+</section>
+
+<!-- T0-9 跟随预览 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-idx">T0-09 / FOLLOW PREVIEW</div>
+    <div>
+      <div class="sec-title">鼠标跟随图片预览</div>
+      <p class="sec-note">作品列表 hover → 预览面板 lerp 跟随(系数 .1);同列 siblings 透明度降到 .45 聚焦当前行。pointer-events:none,移动端降级。</p>
+    </div>
+  </div>
+  <div class="demo" data-cursor="VIEW">
+    <ul class="works" id="worksList">
+      <li data-color="#7ce8b5" data-idx="01"><span class="w-title">遮罩入场系统</span><span class="w-meta">T0-01 · VANILLA</span></li>
+      <li data-color="#5ccf9a" data-idx="02"><span class="w-title">扰动标题编排</span><span class="w-meta">T0-02 · 30 LINES</span></li>
+      <li data-color="#a3f0cd" data-idx="03"><span class="w-title">跟随预览面板</span><span class="w-meta">T0-09 · LERP .1</span></li>
+      <li data-color="#3ea877" data-idx="04"><span class="w-title">声明式动效属性</span><span class="w-meta">T0-12 · DATA-*</span></li>
+    </ul>
+  </div>
+  <div id="preview"><span class="num" id="previewIdx">01</span></div>
+</section>
+
+<!-- T0-5 SVG 描边 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-idx">T0-05 / SVG DRAW</div>
+    <div>
+      <div class="sec-title">描边自绘:绘制顺序 = 叙事顺序</div>
+      <p class="sec-note">stroke-dasharray 归一化,多段 path 拆开错峰:坐标轴先画 → 曲线后画 → 箭头与圈注最后。纯 CSS,零 JS 重播靠 class 切换。</p>
+    </div>
+  </div>
+  <div class="demo">
+    <button class="replay" data-replay="draw">重播</button>
+    <svg id="drawSvg" viewBox="0 0 600 300" aria-label="描边演示:坐标轴、曲线、箭头、圈注依次绘制">
+      <path class="axis drawn d1" pathLength="1" d="M60 250 L60 40 M60 250 L560 250"/>
+      <path class="drawn d3" pathLength="1" d="M60 220 C160 230 200 120 300 110 S460 60 540 70"/>
+      <path class="drawn d4" pathLength="1" d="M528 62 L542 70 L530 82"/>
+      <circle class="drawn d5" pathLength="1" cx="300" cy="110" r="26"/>
+      <path class="drawn d2" pathLength="1" d="M60 250 L300 110" stroke-dasharray="1" opacity=".35"/>
+    </svg>
+  </div>
+</section>
+
+<!-- T0-6 lerp 实验室 + T0-10 视差 -->
+<section id="sec-motion">
+  <div class="sec-head">
+    <div class="sec-idx">T0-06 · T0-10 / DAMPING</div>
+    <div>
+      <div class="sec-title">lerp 阻尼实验室 + 滚动视差</div>
+      <p class="sec-note">一切高级手感的底层原语:current += (target − current) × k。拖动滑块改 k 值,感受"贵"与"肉"的分界;下方色块随滚动差速(k = data-parallax)。</p>
+    </div>
+  </div>
+  <div class="demo" id="lerpLab">
+    <div id="ball">k</div>
+    <div class="lerp-ctl">
+      <input type="range" id="lerpRange" min="2" max="30" value="10" step="1">
+      <div class="readout num" id="lerpReadout">0.10</div>
+    </div>
+  </div>
+  <div class="parallax-zone">
+    <div class="px-block px-1" data-parallax="0.12">k = .12</div>
+    <div class="px-block px-2" data-parallax="0.28">k = .28</div>
+    <div class="px-block px-3" data-parallax="0.45">k = .45</div>
+  </div>
+</section>
+
+<!-- T0-12 声明式 -->
+<section id="sec-decl">
+  <div class="sec-head">
+    <div class="sec-idx">T0-12 / DECLARATIVE</div>
+    <div>
+      <div class="sec-title">声明式动效属性(siena 范式)</div>
+      <p class="sec-note">本页所有 reveal/parallax/cursor 都由 data-* 属性 + 一个 init 函数驱动——动效系统与内容解耦,页面即配置。这几段文字本身就是 data-reveal 进场的。</p>
+    </div>
+  </div>
+  <div data-reveal>
+    <pre>&lt;div <b>data-reveal</b>&gt;滚动入视口淡入&lt;/div&gt;
+&lt;div <b>data-parallax="0.28"</b>&gt;差速滚动&lt;/div&gt;
+&lt;div <b>data-cursor="VIEW"</b>&gt;光标态切换&lt;/div&gt;
+
+// 一个 init 统一扫描接管(本页实际运行版):
+document.querySelectorAll('[data-reveal]').forEach(el =&gt; io.observe(el));
+document.querySelectorAll('[data-parallax]').forEach(el =&gt; px.push(el));
+document.querySelectorAll('[data-cursor]').forEach(el =&gt; bindCursor(el));</pre>
+  </div>
+  <p data-reveal style="margin-top:32px;color:var(--muted);font-size:15px;max-width:560px">T1/T2 手法(Lenis 惯性滚动、ScrollTrigger pin、粒子背景、图片扭曲 shader)不进本页——它们需要库与降级策略,见 techniques.md 对应条目与"能低不高"分级原则。</p>
+</div>
+</section>
+
+<footer>
+  <h3>明确不做</h3>
+  <p>手法收录 ≠ 到处可用。以下场景在 techniques.md 的禁用表里写死:</p>
+  <div class="ban">
+    <em>自定义光标</em> — 投影课件 / 远程演示 ·
+    <em>预加载器</em> — 轻量单文件页 ·
+    <em>页面转场</em> — 单页落地页 ·
+    <em>hover 音效</em> — 课堂 / 办公 ·
+    <em>spring</em> — 入场编排 ·
+    <em>WebGL</em> — 有速度硬约束的页
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- T0-8 预加载器 ---------- */
+var preloader = document.getElementById('preloader'),
+    plNum = document.getElementById('plNum');
+function runPreloader(){
+  preloader.classList.remove('done');
+  preloader.style.display = 'flex';
+  var t0 = performance.now(), dur = reduced ? 10 : 1400;
+  (function tick(now){
+    var p = Math.min((now - t0) / dur, 1);
+    var v = Math.round((1 - Math.pow(1 - p, 3)) * 100); // ease-out 计数
+    plNum.textContent = v;
+    // 数字变化重触发遮罩上滚
+    plNum.style.animation = 'none'; void plNum.offsetWidth; plNum.style.animation = '';
+    if (p < 1) requestAnimationFrame(tick);
+    else setTimeout(function(){ preloader.classList.add('done'); }, 250);
+  })(t0);
+}
+runPreloader();
+
+/* ---------- T0-7 自定义光标(lerp .18) ---------- */
+var cursor = document.getElementById('cursor'),
+    cursorLabel = document.getElementById('cursorLabel'),
+    cx = innerWidth/2, cy = innerHeight/2, tx = cx, ty = cy;
+addEventListener('mousemove', function(e){ tx = e.clientX; ty = e.clientY; });
+(function cursorRaf(){
+  cx += (tx - cx) * .18; cy += (ty - cy) * .18;
+  cursor.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
+  requestAnimationFrame(cursorRaf);
+})();
+document.querySelectorAll('[data-cursor]').forEach(function(el){
+  el.addEventListener('mouseenter', function(){ cursorLabel.textContent = el.dataset.cursor; cursor.classList.add('on'); });
+  el.addEventListener('mouseleave', function(){ cursor.classList.remove('on'); });
+});
+document.querySelectorAll('a,button,.tag').forEach(function(el){
+  el.addEventListener('mouseenter', function(){ cursor.classList.add('on'); });
+  el.addEventListener('mouseleave', function(){ cursor.classList.remove('on'); });
+});
+
+/* ---------- T0-1 遮罩逐行:hero 即播 + demo 重播 ---------- */
+function playLines(scope){
+  scope.querySelectorAll('.line').forEach(function(l){
+    l.classList.remove('play'); void l.offsetWidth; l.classList.add('play');
+  });
+}
+document.querySelectorAll('section:first-of-type .line').forEach(function(l, i){
+  setTimeout(function(){ l.classList.add('play'); }, reduced ? 0 : 1600 + i * 60);
+});
+playLines(document.getElementById('revealDemo'));
+
+/* ---------- T0-2 scramble(load + hover) ---------- */
+var GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ01#$%&';
+function scramble(el, text, dur){
+  dur = dur || 900;
+  if (reduced){ el.textContent = text; return; }
+  var t0 = performance.now();
+  (function tick(now){
+    var p = Math.min((now - t0) / dur, 1),
+        n = Math.floor(p * text.length),
+        rest = '';
+    for (var i = n; i < text.length; i++)
+      rest += text[i] === ' ' ? ' ' : GLYPHS[Math.random() * GLYPHS.length | 0];
+    el.textContent = text.slice(0, n) + rest;
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+var scrambleTarget = document.getElementById('scrambleTarget');
+var SCRAMBLE_TEXT = 'DAMPING IS LUXURY';
+scramble(scrambleTarget, SCRAMBLE_TEXT, 1200);
+scramble(document.getElementById('heroWord'), 'WebGL', 1100);
+document.querySelectorAll('[data-scramble]').forEach(function(a){
+  var orig = a.textContent;
+  a.addEventListener('mouseenter', function(){ scramble(a, orig, 500); });
+});
+
+/* ---------- T0-9 跟随图片预览 ---------- */
+var preview = document.getElementById('preview'),
+    previewIdx = document.getElementById('previewIdx'),
+    px_ = 0, py_ = 0, ptx = 0, pty = 0;
+addEventListener('mousemove', function(e){ ptx = e.clientX + 28; pty = e.clientY - 80; });
+(function pvRaf(){
+  px_ += (ptx - px_) * .1; py_ += (pty - py_) * .1;
+  preview.style.transform = 'translate(' + px_ + 'px,' + py_ + 'px)';
+  requestAnimationFrame(pvRaf);
+})();
+document.querySelectorAll('#worksList li').forEach(function(li){
+  li.addEventListener('mouseenter', function(){
+    preview.style.background = li.dataset.color;
+    previewIdx.textContent = li.dataset.idx;
+    preview.classList.add('show');
+  });
+  li.addEventListener('mouseleave', function(){ preview.classList.remove('show'); });
+});
+
+/* ---------- T0-5 SVG 描边重播 ---------- */
+var drawSvg = document.getElementById('drawSvg');
+function playDraw(){ drawSvg.classList.remove('play'); void drawSvg.getBoundingClientRect(); drawSvg.classList.add('play'); }
+playDraw();
+
+/* ---------- T0-6 lerp 实验室 ---------- */
+var lab = document.getElementById('lerpLab'), ball = document.getElementById('ball'),
+    range = document.getElementById('lerpRange'), readout = document.getElementById('lerpReadout'),
+    bx = 140, by = 140, btx = 140, bty = 140, k = .1;
+lab.addEventListener('mousemove', function(e){
+  var r = lab.getBoundingClientRect();
+  btx = Math.max(0, Math.min(e.clientX - r.left - 22, r.width - 44));
+  bty = Math.max(0, Math.min(e.clientY - r.top - 22, 320 - 44));
+});
+range.addEventListener('input', function(){
+  k = range.value / 100;
+  readout.textContent = k.toFixed(2);
+});
+(function ballRaf(){
+  bx += (btx - bx) * k; by += (bty - by) * k;
+  ball.style.transform = 'translate(' + bx + 'px,' + by + 'px)';
+  requestAnimationFrame(ballRaf);
+})();
+
+/* ---------- T0-10 视差(声明式 data-parallax) ---------- */
+var pxEls = [].slice.call(document.querySelectorAll('[data-parallax]'));
+(function pxRaf(){
+  var vh = innerHeight;
+  pxEls.forEach(function(el){
+    var r = el.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > vh) return;
+    var delta = (r.top + r.height/2 - vh/2) * parseFloat(el.dataset.parallax);
+    el.style.transform = 'translateY(' + (-delta).toFixed(1) + 'px)';
+  });
+  requestAnimationFrame(pxRaf);
+})();
+
+/* ---------- T0-12 声明式 reveal ---------- */
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+  });
+}, { threshold: .15 });
+document.querySelectorAll('[data-reveal]').forEach(function(el){ io.observe(el); });
+
+/* ---------- 重播按钮 ---------- */
+document.querySelectorAll('[data-replay]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var what = btn.dataset.replay;
+    if (what === 'reveal') playLines(document.getElementById('revealDemo'));
+    else if (what === 'scramble') scramble(scrambleTarget, SCRAMBLE_TEXT, 1200);
+    else if (what === 'draw') playDraw();
+  });
+});
+})();
+</script>
+</body>
+</html>

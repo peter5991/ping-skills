@@ -23,6 +23,7 @@
 | tsParticles | 4.4.0 | MIT | 粒子特效 | `tsparticles.bundle.min.js` |
 | PixiJS | 8.20.1 | MIT | 2D WebGL 高性能特效 | `dist/pixi.min.js` |
 | Rough.js | 4.6.6 | MIT | 手绘风图形/图表 | `bundled/rough.js` |
+| Tone.js | 15.1.22 | MIT(2026-09-24 npm registry 核验) | Web Audio 音频引擎:采样器/合成器/时序(交互乐器、音效) | `build/Tone.js`(UMD,~345KB) |
 
 ## 排除项
 
@@ -31,6 +32,14 @@
 | p5.js | LGPL-2.1，商用交付不友好 |
 | particles.js（旧） | 已停更，用 tsParticles 替代 |
 | AOS / ScrollReveal | 滚动入场用原生 Intersection Observer + CSS 即可，避免多滚动控制器并存 |
+
+## 字体(本地 woff2,核实 2026-09-23)
+
+| 字体 | 版本 | 许可证 | 用途 | 本地化方式 |
+|---|---|---|---|---|
+| Inter(可变) | @fontsource-variable/inter 5.2.5 | SIL OFL-1.1 | 西文正文/展示字族,字重 100–900——**PPNeueMontreal / Neue Haas 类商业 Grotesk 的免费平替**(Dala 风 200 超细正文靠它成立) | jsDelivr 直取 `files/inter-latin-wght-normal.woff2`(+`-latin-ext-`),两文件共 ~123KB;`@font-face` 声明 `font-weight:100 900` + unicode-range 分包 |
+
+- CJK 不自托管(裁剪后仍数 MB),走系统栈 `"PingFang SC","Microsoft YaHei",system-ui`(design-foundation 排版 #2)。
 
 ## 本地化下载
 

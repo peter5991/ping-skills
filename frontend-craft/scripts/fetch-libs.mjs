@@ -54,6 +54,9 @@ const LIBS = [
   { name: 'rough', pkg: 'roughjs', version: '4.6.6', files: [
     { match: 'bundled/rough.js', out: 'rough.js' },
   ]},
+  { name: 'tone', pkg: 'tone', version: '15.1.22', files: [
+    { match: 'build/Tone.js', out: 'Tone.js' },
+  ]},
 ];
 
 const targetDir = path.resolve(process.argv[2] || './libs');
