@@ -10,6 +10,8 @@
 | Threejs-Punk | https://github.com/anshul360/threejs-punk (demo: https://threejspunk.vercel.app/) | 赛博朋克雨巷漫游 | Three.js r185 WebGPU + TSL、three-mesh-bvh、GSAP | 2026-09-26 | factory 架构、性能预算纪律、GPU 碰撞雨、湿地面反射、TSL 模式 | threejs-punk.md |
 | AutoPiano 3D 钢琴 | https://www.autopiano.cn/zh-TW/3d (站: https://www.autopiano.cn/,抓包须带 Referer) | 可交互 3D 乐器 | Three.js WebGL + Tone.js,Nuxt SSR 懒加载 | 2026-09-24 | 程序化建模、弹簧物理按键、Raycaster 白名单拾取、采样音频 | ../case-autopiano-3d.md |
 | rocksdanister/rain | https://github.com/rocksdanister/rain | 玻璃雨滴 shader | WebGL shader(BigWings 风格) | 2026-09-26 | 程序化水滴/拖尾/卫星滴;threejs-punk 车身雨滴的原始出处,移植须保留 credit | 见 threejs-punk.md §5 |
+| WebCraft (Kaigen) | https://github.com/Kaigen-Technologies/kaigen-minecraft-opus-5-5 | 体素沙盒(Minecraft 式) | C + WASM + WebGPU(Kaigen 引擎,闭源 beta),GLSL 单源多端 | 2026-09-26 | 体素世界架构(chunk 流式/光照洪泛/网格化)、完整延迟渲染管线、全程序化内容(零美术资产) | webcraft-kaigen.md |
+| iamtechartist(作者合集) | https://github.com/iamtechartist | Three.js 案例作者主页(17 个案例,demo 均在 iamtechartist.github.io/<仓库名>) | Three.js,部分 TSL/WebGPU、WebGL2 raymarching | 2026-09-26 | 程序化场景/水体模拟/机械教学案例集;**AI 对话式开发工作流的完整标本**(遥测接口/自验收断言/双实现镜像) | iamtechartist-ai-cases.md |
 
 ## 动效 / 风格案例(9 站 Awwwards 实测 + 衍生)
 
