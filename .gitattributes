@@ -1,0 +1,2 @@
+# Windows 检出(autocrlf=true)不把 CRLF 带进 bash 脚本
+*.sh text eol=lf
