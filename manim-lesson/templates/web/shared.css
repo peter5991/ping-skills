@@ -1,0 +1,61 @@
+/* 与 common.py 同一组设计令牌;一课一主色,--accent 随该课 common.py 的 ACCENT 同步改 */
+:root {
+  --bg: #0B0D10;
+  --panel: #14181D;
+  --hairline: #2A3038;
+  --ink: #E8E8E8;
+  --muted: #9AA3AD;
+  --good: #83C167;
+  --warn: #F26D5B;
+  --data: #7E9CB5;
+  --accent: #5FB4CC;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%;
+  background: var(--bg); color: var(--ink);
+  font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  padding: 18px 24px;
+}
+header h1 { margin: 0; font-size: 26px; font-weight: 600; }
+header p { margin: 4px 0 0; color: var(--muted); font-size: 16px; }
+.main { display: grid; grid-template-columns: 1.35fr 1fr; gap: 18px; min-height: 0; }
+.card { background: var(--panel); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px; min-height: 0; display: flex; flex-direction: column; }
+.card h2 { margin: 0 0 6px; font-size: 17px; color: var(--muted); font-weight: 500; }
+svg { width: 100%; height: 100%; display: block; touch-action: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button, .seg label {
+  font: inherit; font-size: 16px;
+  color: var(--ink); background: #1d232a; border: 1px solid var(--hairline);
+  border-radius: 8px; padding: 7px 14px; cursor: pointer;
+}
+button:hover { border-color: var(--muted); }
+button.primary { background: #23361c; border-color: var(--good); color: var(--good); }
+button.warn { border-color: var(--warn); color: var(--warn); }
+button.on { background: #3a2020; }
+.seg { display: inline-flex; gap: 0; }
+.seg input { display: none; }
+.seg label { border-radius: 0; }
+.seg label:first-of-type { border-radius: 8px 0 0 8px; }
+.seg label:last-of-type { border-radius: 0 8px 8px 0; }
+.seg input:checked + label { background: #2b3440; border-color: var(--accent); color: var(--accent); }
+.stats { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 18px; align-items: baseline; }
+.stats .k { color: var(--muted); font-size: 15px; }
+.big { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hint { color: var(--muted); font-size: 14px; }
+.axis line, .axis path { stroke: #6b737c; }
+.axis text { fill: #9aa3ad; font-size: 13px; }
+.handle { cursor: grab; }
+.handle:active { cursor: grabbing; }
+.drag-pt { cursor: ew-resize; }
+.pulse { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }

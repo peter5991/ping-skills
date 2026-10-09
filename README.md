@@ -12,8 +12,9 @@
 | [bp-roadshow-guide](bp-roadshow-guide/) | 创业/双创比赛商业计划书(BP)撰写与路演设计指导：评审逻辑、BP 17 模块、路演全流程、PPT 与网页双载体规范，附自检清单 | 商业计划书、网评材料、参赛 PPT、路演设计、路演网页 |
 | [competition-deck](competition-deck/) | 16:9 翻页式「类 PPT」网页制作：10 种比赛页型目录、浅色竞赛母版 token、Codex CLI 配图管线，比赛/通用双模式 | 比赛 PPT 网页、路演网页、参赛演示页、PPT 式 HTML、幻灯片网页 |
 | [lesson-prep](lesson-prep/) | 备课预制课件页工作流：滚动叙事解禁、GSAP/Lenis 本地库、七配方武器库、探针验收、课程登记 | 备课、照教案做网页、预制课件页 |
+| [manim-lesson](manim-lesson/) | Manim 动画课件双产物工作流：一套场景源码产出 edge-tts 配音成片 mp4 + reveal.js 分章课堂课件(半自动 TTS/字幕、可嵌 SVG 交互教具、离线 vendor),数字纪律 + 旁白双轨 + JIT 临场实验路线 | 做动画课件、Manim 课件、讲解视频、动画演示课、数学/物理精确动画推导 |
 
-> 注:competition-deck 与 lesson-prep 源自私有项目(课堂 AI 助教),文中部分路径(如 `assets/lesson/libs/`、`electron/agent/pagegen-prompt.ts`)相对该项目仓库,移植使用时需按自身环境调整。
+> 注:competition-deck、lesson-prep 与 manim-lesson 源自私有项目(课堂 AI 助教),文中部分路径(如 `assets/lesson/libs/`、`electron/agent/pagegen-prompt.ts`、`tools/manim-env`)相对该项目仓库,移植使用时需按自身环境调整。
 
 ## 安装
 
